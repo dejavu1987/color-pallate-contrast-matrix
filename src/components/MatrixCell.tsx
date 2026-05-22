@@ -1,0 +1,66 @@
+import type { WcagVerdict } from '../lib/contrast';
+
+type Props = {
+  bg: string;
+  fg: string;
+  v: WcagVerdict;
+  onClick: () => void;
+};
+
+function Pip({ pass, label }: { pass: boolean; label: string }) {
+  return (
+    <span
+      title={label}
+      className="inline-flex items-center justify-center text-[9px] leading-none px-1 py-[1px] rounded-sm border"
+      style={{
+        borderColor: 'currentColor',
+        backgroundColor: pass ? 'currentColor' : 'transparent',
+        color: 'inherit',
+      }}
+    >
+      <span style={{ color: pass ? 'transparent' : 'inherit', mixBlendMode: 'difference' }}>
+        {label}
+      </span>
+    </span>
+  );
+}
+
+export function MatrixCell({ bg, fg, v, onClick }: Props) {
+  const isDiagonal = bg.toLowerCase() === fg.toLowerCase();
+  const ariaLabel =
+    `Background ${bg}, foreground ${fg}, contrast ratio ${v.ratio.toFixed(2)}. ` +
+    `AA normal: ${v.passes.aaNormal ? 'pass' : 'fail'}, ` +
+    `AAA normal: ${v.passes.aaaNormal ? 'pass' : 'fail'}, ` +
+    `AA large: ${v.passes.aaLarge ? 'pass' : 'fail'}, ` +
+    `AAA large: ${v.passes.aaaLarge ? 'pass' : 'fail'}.`;
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={ariaLabel}
+      data-diagonal={isDiagonal ? 'true' : undefined}
+      className="w-24 h-24 flex flex-col items-center justify-center gap-1 border border-black/10 focus:outline focus:outline-2 focus:outline-blue-500"
+      style={{
+        backgroundColor: bg,
+        color: fg,
+        opacity: isDiagonal ? 0.45 : 1,
+        cursor: 'pointer',
+      }}
+    >
+      <span className="text-lg font-semibold tabular-nums">{v.ratio.toFixed(2)}</span>
+      {!isDiagonal && (
+        <div className="flex flex-col gap-[2px] items-center">
+          <div className="flex gap-1">
+            <Pip pass={v.passes.aaNormal} label="AA" />
+            <Pip pass={v.passes.aaaNormal} label="AAA" />
+          </div>
+          <div className="flex gap-1 text-[8px] opacity-90">
+            <Pip pass={v.passes.aaLarge} label="AA·L" />
+            <Pip pass={v.passes.aaaLarge} label="AAA·L" />
+          </div>
+        </div>
+      )}
+    </button>
+  );
+}

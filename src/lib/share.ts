@@ -45,3 +45,42 @@ export function decodePaletteFromHash(hash: string): Palette {
 }
 
 export type { Color, Palette };
+
+const STORAGE_KEY = 'contrast-matrix:palette:v1';
+
+export function savePaletteToStorage(palette: Palette): void {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(palette));
+  } catch {
+    // Quota or disabled storage — silently ignore.
+  }
+}
+
+export function loadPaletteFromStorage(): Palette | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return null;
+    const palette: Palette = [];
+    for (const item of parsed) {
+      if (
+        item &&
+        typeof item === 'object' &&
+        typeof item.id === 'string' &&
+        typeof item.hex === 'string'
+      ) {
+        const canonical = normalizeHex(item.hex);
+        if (!canonical) continue;
+        palette.push({
+          id: item.id,
+          hex: canonical,
+          ...(typeof item.label === 'string' ? { label: item.label } : {}),
+        });
+      }
+    }
+    return palette;
+  } catch {
+    return null;
+  }
+}

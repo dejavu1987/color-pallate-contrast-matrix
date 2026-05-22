@@ -44,6 +44,7 @@ export function CellDetailDrawer({ selection, onClose }: Props) {
   return (
     <aside
       role="dialog"
+      aria-modal="true"
       aria-label="Contrast details"
       className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-white shadow-xl border-l border-black/10 z-30 flex flex-col"
     >

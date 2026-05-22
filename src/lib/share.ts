@@ -1,4 +1,4 @@
-import { normalizeHex } from './contrast';
+import { normalizeHex, contrastRatio } from './contrast';
 import { createColor, type Color, type Palette } from './palette';
 
 const HASH_PREFIX = '#p=';
@@ -83,4 +83,41 @@ export function loadPaletteFromStorage(): Palette | null {
   } catch {
     return null;
   }
+}
+
+function csvCell(value: string): string {
+  if (value.includes(',') || value.includes('"') || value.includes('\n')) {
+    return `"${value.replace(/"/g, '""')}"`;
+  }
+  return value;
+}
+
+export function buildMatrixCsv(palette: Palette): string {
+  if (palette.length === 0) return '';
+  const labels = palette.map((c) => c.label && c.label.length > 0 ? c.label : c.hex);
+  const header = [''].concat(labels.map(csvCell)).join(',');
+  const rows = palette.map((rowColor, i) => {
+    const cells = palette.map((colColor) => contrastRatio(rowColor.hex, colColor.hex).toFixed(2));
+    return [csvCell(labels[i]), ...cells].join(',');
+  });
+  return [header, ...rows].join('\n') + '\n';
+}
+
+export function triggerDownload(filename: string, content: string, mime: string): void {
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+export function todayStamp(date: Date = new Date()): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
 }

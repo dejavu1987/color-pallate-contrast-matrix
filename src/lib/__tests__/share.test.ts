@@ -54,6 +54,41 @@ describe('encodePaletteToHash / decodePaletteFromHash', () => {
   });
 });
 
+import { buildMatrixCsv } from '../share';
+
+describe('buildMatrixCsv', () => {
+  it('produces a labeled NxN matrix with ratios', () => {
+    const a = createColor('#ffffff', 'Surface');
+    const b = createColor('#000000', 'Ink');
+    const csv = buildMatrixCsv([a, b]);
+    const lines = csv.trim().split('\n');
+    expect(lines).toHaveLength(3);
+    expect(lines[0]).toBe(',Surface,Ink');
+    expect(lines[1]).toMatch(/^Surface,1\.00,21\.00$/);
+    expect(lines[2]).toMatch(/^Ink,21\.00,1\.00$/);
+  });
+
+  it('falls back to hex when no label is set', () => {
+    const a = createColor('#ffffff');
+    const b = createColor('#000000');
+    const csv = buildMatrixCsv([a, b]);
+    const lines = csv.trim().split('\n');
+    expect(lines[0]).toBe(',#ffffff,#000000');
+  });
+
+  it('quotes labels that contain commas', () => {
+    const a = createColor('#ffffff', 'A, B');
+    const b = createColor('#000000');
+    const csv = buildMatrixCsv([a, b]);
+    const lines = csv.trim().split('\n');
+    expect(lines[0]).toBe(',"A, B",#000000');
+  });
+
+  it('returns empty string for empty palette', () => {
+    expect(buildMatrixCsv([])).toBe('');
+  });
+});
+
 describe('savePaletteToStorage / loadPaletteFromStorage', () => {
   beforeEach(() => {
     localStorage.clear();

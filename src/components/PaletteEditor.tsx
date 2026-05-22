@@ -33,6 +33,13 @@ function Row({
   return (
     <div className="flex items-center gap-2 py-1">
       <input
+        type="color"
+        aria-label="Color picker"
+        value={color.hex}
+        onChange={(e) => onEdit({ hex: e.target.value })}
+        className="w-8 h-8 rounded cursor-pointer border border-black/15"
+      />
+      <input
         type="text"
         aria-label="Hex"
         value={hexDraft}

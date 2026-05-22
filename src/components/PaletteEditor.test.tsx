@@ -48,7 +48,7 @@ describe('PaletteEditor', () => {
     const c1 = createColor('#ffffff');
     const onChange = vi.fn();
     render(<PaletteEditor palette={[c1]} onChange={onChange} />);
-    const hexInput = screen.getByDisplayValue('#ffffff');
+    const hexInput = screen.getByLabelText('Hex');
     await userEvent.clear(hexInput);
     await userEvent.type(hexInput, '#000000');
     const lastCallPalette = onChange.mock.calls.at(-1)![0];

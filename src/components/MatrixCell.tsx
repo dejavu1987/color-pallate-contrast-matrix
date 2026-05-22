@@ -7,20 +7,18 @@ type Props = {
   onClick: () => void;
 };
 
-function Pip({ pass, label }: { pass: boolean; label: string }) {
+function Pip({ pass, label, bg }: { pass: boolean; label: string; bg: string }) {
   return (
     <span
       title={label}
-      className="inline-flex items-center justify-center text-[9px] leading-none px-1 py-[1px] rounded-sm border"
+      className="inline-flex items-center justify-center text-[9px] font-medium leading-none px-1 py-[1px] rounded-sm border min-w-[18px]"
       style={{
         borderColor: 'currentColor',
         backgroundColor: pass ? 'currentColor' : 'transparent',
-        color: 'inherit',
+        color: pass ? bg : 'currentColor',
       }}
     >
-      <span style={{ color: pass ? 'transparent' : 'inherit', mixBlendMode: 'difference' }}>
-        {label}
-      </span>
+      {label}
     </span>
   );
 }
@@ -52,12 +50,12 @@ export function MatrixCell({ bg, fg, v, onClick }: Props) {
       {!isDiagonal && (
         <div className="flex flex-col gap-[2px] items-center">
           <div className="flex gap-1">
-            <Pip pass={v.passes.aaNormal} label="AA" />
-            <Pip pass={v.passes.aaaNormal} label="AAA" />
+            <Pip pass={v.passes.aaNormal} label="AA" bg={bg} />
+            <Pip pass={v.passes.aaaNormal} label="AAA" bg={bg} />
           </div>
-          <div className="flex gap-1 text-[8px] opacity-90">
-            <Pip pass={v.passes.aaLarge} label="AA·L" />
-            <Pip pass={v.passes.aaaLarge} label="AAA·L" />
+          <div className="flex gap-1">
+            <Pip pass={v.passes.aaLarge} label="AA·L" bg={bg} />
+            <Pip pass={v.passes.aaaLarge} label="AAA·L" bg={bg} />
           </div>
         </div>
       )}

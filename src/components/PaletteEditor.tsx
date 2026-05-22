@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { addColor, createColor, removeColor, updateColor, type Color, type Palette } from '../lib/palette';
+import { addColor, createColor, findDuplicateIds, removeColor, updateColor, type Color, type Palette } from '../lib/palette';
 import { normalizeHex } from '../lib/contrast';
 
 type Props = {
@@ -11,10 +11,12 @@ function Row({
   color,
   onEdit,
   onRemove,
+  isDuplicate,
 }: {
   color: Color;
   onEdit: (patch: { hex?: string; label?: string }) => void;
   onRemove: () => void;
+  isDuplicate: boolean;
 }) {
   const [hexDraft, setHexDraft] = useState(color.hex);
 
@@ -55,6 +57,15 @@ function Row({
         onChange={(e) => onEdit({ label: e.target.value })}
         className="flex-1 max-w-xs text-sm px-2 py-1 rounded border border-black/15"
       />
+      {isDuplicate && (
+        <span
+          title="Another row uses the same color"
+          aria-label="Duplicate color"
+          className="text-amber-600 text-sm"
+        >
+          ⚠
+        </span>
+      )}
       <button
         type="button"
         onClick={onRemove}
@@ -68,6 +79,8 @@ function Row({
 }
 
 export function PaletteEditor({ palette, onChange }: Props) {
+  const duplicates = new Set(findDuplicateIds(palette));
+
   function handleEdit(id: string, patch: { hex?: string; label?: string }) {
     onChange(updateColor(palette, id, patch));
   }
@@ -87,6 +100,7 @@ export function PaletteEditor({ palette, onChange }: Props) {
           color={c}
           onEdit={(patch) => handleEdit(c.id, patch)}
           onRemove={() => handleRemove(c.id)}
+          isDuplicate={duplicates.has(c.id)}
         />
       ))}
       <button

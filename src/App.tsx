@@ -73,11 +73,13 @@ export default function App() {
 
       <section>
         <h2 className="text-sm font-medium text-black/70 mb-2">Contrast matrix</h2>
-        <div ref={matrixRef} className="inline-block bg-white">
-          <ContrastMatrix
-            palette={palette}
-            onCellClick={(row, col) => setSelection({ row, col })}
-          />
+        <div className="overflow-x-auto">
+          <div ref={matrixRef} className="inline-block bg-white">
+            <ContrastMatrix
+              palette={palette}
+              onCellClick={(row, col) => setSelection({ row, col })}
+            />
+          </div>
         </div>
       </section>
 
